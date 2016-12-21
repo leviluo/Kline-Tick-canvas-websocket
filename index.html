@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="./css/index.css" />
+    <title>test</title>
+</head>
+
+<body class="container">
+    <div>
+        <button class="btn" onclick="changeLine('canvas')">实时</button>
+        <button class="btn" onclick="changeLine('canvasKL')">k</button>
+        <button class="btn" onclick="changeLine('canvas5KL')">5k</button>
+        <button class="btn" onclick="changeLine('canvas15KL')">15k</button>
+        <button name="btns" onclick="changeContract()">切换合约</button>
+        <button name="btns" onclick="changeContract1()">切换合约1</button>
+        <span id="result" style="color:red"></span>
+    </div>
+    <br>
+    <div id="loading">
+            <img src="./img/loading.gif" width="80%" draggable="false" alt="">
+    </div>
+    <div class="kline">
+        <div id="tips"></div>
+        <canvas id="canvas" height="300">
+            <p>您的浏览器不支持html5</p>
+        </canvas>
+    </div>
+    <div class="kline" style="display:block">
+        <div id="canvasKLTips"></div>
+        <canvas id="canvasKL" height="300">
+            <p>hey,您的浏览器不支持html5，换个浏览器吧，比如google chrome，firefox</p>
+        </canvas>
+    </div>
+    <div class="kline">
+    <div id="canvas5KLTips"></div>
+        <canvas id="canvas5KL" height="300">
+            <p>hey,您的浏览器不支持html5，换个浏览器吧，比如google chrome，firefox</p>
+        </canvas>
+    </div>
+    <div class="kline">
+    <div id="canvas15KLTips"></div>
+        <canvas id="canvas15KL" height="300">
+            <p>hey,您的浏览器不支持html5，换个浏览器吧，比如google chrome，firefox</p>
+        </canvas>
+    </div>
+
+<script src="./js/ajax.js" type="text/javascript" /></script>
+<script src="./js/util.js" type="text/javascript" /></script>
+<script src="./js/event.js" type="text/javascript" /></script>
+<script src="./js/Drawing.js" type="text/javascript" /></script>
+<script src="./js/Tips.js" type="text/javascript" /></script>
+<script src="./js/initKlineCanvas.js" type="text/javascript" /></script>
+<script src="./js/initTickCanvas.js" type="text/javascript" /></script>
+<script src="./js/init.js" type="text/javascript" /></script>
+
+</body>
+
+
+</html>

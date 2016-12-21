@@ -1,0 +1,51 @@
+.container {
+    width: 80%;
+    margin: 30px auto;
+    position: relative
+}
+
+.container .kline{
+    display: none;
+    background-image: url(../img/world.jpg);
+    background-position: top center;
+    background-size: cover
+}
+
+.btn{
+    height: 40px;
+    padding: 0 5px;
+    width: 40px;
+    border-radius: 5px;
+    background: #efefef;
+    border: none;
+    color: red;
+}
+
+.btn:nth-of-type(2){
+    background:#666;
+    color:white;
+}
+
+.btn:hover {
+    cursor: pointer;
+    background: #ccc;
+}
+
+.btn:focus{
+    background:#666 !important;
+    color:white !important;
+}
+
+
+#loading {
+    display: none;
+    position: absolute;
+     moz-user-select: -moz-none;
+    -moz-user-select: none;
+    -o-user-select:none;
+    -khtml-user-select:none;
+    -webkit-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+}
+
