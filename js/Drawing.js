@@ -111,7 +111,39 @@ drawing.prototype = {
         this.currentX = 0;
         for (var i = 0; i < items.length; i++) {
             this.drawCandle(i, items[i], parentQuote)
+            this.drawVolume(i, items[i], parentQuote)
         }
+        this.paintVolumeBorder()
+    },
+    paintVolumeBorder:function(){
+        this.ctx.lineWidth = "1px";
+        this.ctx.strokeStyle = "#efefef";
+        this.ctx.strokeRect(this.options.volume.x, this.options.volume.y, this.options.volume.width, this.options.volume.height);
+    },
+    drawVolume:function(i,ki,parentQuote){
+        var color;
+        var lineX = parentQuote.getX(i)
+        var topY = parentQuote.getVolumeY(ki[5]);
+        var topX = lineX - this.options.barWidth / 2;
+        // var candleY, candleHeight;
+        if (ki[4] > ki[1]) { //红线
+            // candleY = parentQuote.getY(ki[4]);
+            // candleHeight = parentQuote.getY(ki[1]) - candleY;
+            color = this.options.riseColor;
+        } else if (ki[4] < ki[1]) { //绿线
+            // candleY = parentQuote.getY(ki[1]);
+            // candleHeight = parentQuote.getY(ki[4]) - candleY;
+            color = this.options.fallColor;
+        } else { //白线
+            // candleY = parentQuote.getY(ki[1]);
+            // candleHeight = 1;
+            color = '#fff';
+        }
+        this.ctx.fillStyle = color;
+        // this.ctx.strokeStyle = color;
+
+        this.ctx.beginPath();
+        this.ctx.fillRect(topX, topY, this.options.barWidth, parentQuote.options.volume.y+parentQuote.options.volume.height-topY);
     },
     drawCandle: function(i, ki, parentQuote) {
         var color;
@@ -139,7 +171,7 @@ drawing.prototype = {
             color = '#fff';
         }
         this.ctx.fillStyle = color;
-        this.ctx.strokeStyle = color;
+        // this.ctx.strokeStyle = color;
         //画线
         this.ctx.beginPath();
         this.ctx.moveTo(lineX, topY);
@@ -150,9 +182,8 @@ drawing.prototype = {
         this.ctx.fillRect(candleX, candleY, this.options.barWidth, candleHeight);
     },
     paintTips: function(position, text) {
-        // this.ctx.lineWidth = 1
-        this.paintVine(position.x, this.options.region.y, this.options.region.height)
-        this.paintTipContent(480, text)
+        this.paintVine(position.x, this.options.region.y, this.options.volume.y+this.options.volume.height-this.options.region.y)
+        this.paintTipContent(580, text)
         this.paintPoint(position)
     },
     paintTipContent: function(width, text) {

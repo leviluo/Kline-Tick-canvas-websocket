@@ -5,10 +5,11 @@ function isEmpty(value) {
 //格式化时间
 function formatDate(timestamp) {
     var now = new Date(timestamp);
-    var month = now.getMonth();
+    var month = now.getMonth() + 1;
     var date = now.getDate();
     var hour = now.getHours();
     var minute = now.getMinutes();
+
     if (minute < 10) {
         minute = '0' + minute;
     };

@@ -32,6 +32,7 @@ function init(options) {
 init.prototype = {
     initWs: function() {
         this.lastData = [];
+
         if (this.options.websocketUrl) this.ws = new WebSocket(this.options.websocketUrl)
         var ws = this.ws;
         var that = this;
@@ -76,7 +77,6 @@ init.prototype = {
                     var historyKlineData = that.historyArray['canvas15KL']
                     var id = 'canvas15KL'
                 } else {
-                    // console.log('返回了')
                     return
                 }
 
@@ -94,15 +94,15 @@ init.prototype = {
                 sss[2] = parseFloat(data['4']);
                 sss[3] = parseFloat(data['5']);
                 sss[4] = parseFloat(data['3']);
+                sss[5] = parseFloat(data['9']);
 
                 historyKlineData.pop();
                 historyKlineData.push(sss)
-                historyKlineData.push([sss[0] + data['8'] * 1000, sss[1], sss[2], sss[3], sss[4]]);
+                historyKlineData.push([sss[0] + data['8'] * 1000, sss[1], sss[2], sss[3], sss[4],sss[5]]);
 
                 // that.configKline(id, true);
-                that.painting[id].addNewData(this.historyArray[id]);
+                that.painting[id].addNewData(that.historyArray[id]);
                 if (data['8'] == '60') {
-
                     that.historyArray['canvas'].pop();
                     that.historyArray['canvas'].push([sss[0], sss[4]])
                     that.historyArray['canvas'].push([sss[0] + 1, sss[4]])
@@ -119,7 +119,7 @@ init.prototype = {
         var high = Math.max(price, lastPoint[2]);
         var low = Math.min(price, lastPoint[3]);
         var close = price;
-        this.historyArray[type][this.historyArray[type].length - 1] = [time, open, high, low, close];
+        this.historyArray[type][this.historyArray[type].length - 1] = [time, open, high, low, close,0];
         // this.configKline(type);
         // console.log(type)
         this.painting[type].updateLastPoint(this.historyArray[type])
@@ -244,7 +244,7 @@ init.prototype = {
         // 拿到历史行情
         for (var i = 0; i < data.length; i++) {
             var str = JSON.parse(data[i]);
-            this.historyArray[this.type].push([str['6'] * 1000, str['2'], str['4'], str['5'], str['3']])
+            this.historyArray[this.type].push([str['6'] * 1000, str['2'], str['4'], str['5'], str['3'], str['8']])
             if (this.type == 'canvasKL') {
                 this.historyArray['canvas'].unshift([str['6'] * 1000, str['3']])
             }
@@ -256,7 +256,7 @@ init.prototype = {
 
         //画一个空白点
         var lastPoint = this.historyArray[this.type][this.historyArray[this.type].length - 1];
-        this.historyArray[this.type].push([lastPoint[0] + this.lineType[this.type] * 1000, lastPoint[4], lastPoint[4], lastPoint[4], lastPoint[4]]);
+        this.historyArray[this.type].push([lastPoint[0] + this.lineType[this.type] * 1000, lastPoint[4], lastPoint[4], lastPoint[4], lastPoint[4],0]);
 
         this.configKline();
 
@@ -266,9 +266,21 @@ init.prototype = {
             this.configTick('canvas');
         }
 
-        this.ws.send('1:' + this.contract);
-        this.ws.send('3:' + this.contract);
+        var me = this
 
+
+        if (!this.ws.readyState) {
+            var setin = setInterval(function() {
+                if (me.ws.readyState) {
+                    clearInterval(setin)
+                    me.ws.send('1:' + me.contract);
+                    me.ws.send('3:' + me.contract);
+                };
+            }, 10)
+        } else {
+            this.ws.send('1:' + this.contract);
+            this.ws.send('3:' + this.contract);
+        }
         // })
     },
 
@@ -297,7 +309,7 @@ init.prototype = {
                 },
                 riseColor: 'red',
                 fallColor: 'green',
-                region: { x: 0.5, y: 30, width: initialWidth, height: 240 }, //主绘图区域
+                region: { x: 0, y: 30, width: initialWidth, height: 240 }, //主绘图区域
                 barWidth: 4,
                 spaceWidth: 2,
                 horizontalLineCount: 7,
@@ -307,6 +319,12 @@ init.prototype = {
                     { color: 'rgb(255,165,0)', daysCount: 10 },
                     { color: 'rgb(30,144,255)', daysCount: 20 }
                 ],
+                volume:{
+                    x:0,
+                    y:300,
+                    height:80,
+                    width:initialWidth
+                },
                 xAxis: {
                     font: '1em Helvetica', //
                     color: 'yellow',
@@ -430,7 +448,7 @@ initial.initWs(); //初始化websocket
 
 initial.run({ //初始化画图
     type: "canvasKL",
-    contract: "CL1701"
+    contract: "CL1702"
 });
 
 function changeContract() { //切换合约
@@ -438,7 +456,7 @@ function changeContract() { //切换合约
 }
 
 function changeContract1() { //切换合约
-    initial.changeContract("CL1701")
+    initial.changeContract("CL1702")
 }
 
 function changeLine(type) { //切换视图

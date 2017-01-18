@@ -11,7 +11,7 @@ initKlineCanvas.prototype = {
         // this.isMove = false;
         var region = this.options.region;
         var options = this.options
-        this.ctx.clearRect(0, 0, region.width, 300); //清除画布
+        this.ctx.clearRect(0, 0, region.width, 400); //清除画布
 
         var DataLength = this.data.length
         var dataActualCount = Math.ceil(region.width / (options.spaceWidth + options.barWidth)) - 1; //
@@ -22,14 +22,11 @@ initKlineCanvas.prototype = {
         } else {
             var timeMaxWidth = options.region.width;
         }
-        // console.log(ranges)
-        // console.log(DataLength, dataActualCount)
 
         this.dataRanges = ranges ? ranges : { //onMove event的ranges计算
             start: 100 * (DataLength - dataActualCount) / DataLength,
             to: 100
         };
-        // console.log(this.dataRanges)
 
         //新增数据重现计算ranges
         if (isNewData) {
@@ -71,24 +68,34 @@ initKlineCanvas.prototype = {
 
         var init = new drawing(this.ctx, options)
 
-        var high, low;
+        var high, low,highV,lowV;
         filteredData.each(function(val, a, i) {
             if (i == 0) {
                 high = val[2];
                 low = val[3];
+                highV = val[5]
+                lowV = val[5]
             } else {
                 high = Math.max(val[2], high);
                 low = Math.min(low, val[3]);
+                highV = Math.max(val[5], highV);
+                lowV = Math.min(lowV, val[5]);
             }
         });
         this.high = high;
         this.low = low;
+        this.highV = highV;
+        this.lowV = lowV;
         //移动平均线
         // this.paintMAs(filteredData,high,low);
         this.currentX = 0;
-        //画蜡烛
+        //画蜡烛和成交量
         init.paintCandleLine(filteredData, this)
-            //水平线和价格
+
+        // console.log(highV,lowV)
+        //画量图
+        // init.paintVolume(filteredData)
+        //水平线和价格
         var priceItems = calcAxisValues(high, low, (options.horizontalLineCount))
         init.drawHLineandPrice(priceItems);
         //垂直线和时间
@@ -131,7 +138,9 @@ initKlineCanvas.prototype = {
     getY: function(price) {
         return ((this.high - price) * this.options.region.height / (this.high - this.low)) + this.options.region.y;
     },
-
+    getVolumeY: function(per) {
+        return ((this.highV - per) * this.options.volume.height / (this.highV - this.lowV)) + this.options.volume.y;
+    },
     addEvts: function() {
         this.isMove = false
         var me = this;
@@ -146,19 +155,19 @@ initKlineCanvas.prototype = {
                 tips.style.display = "none"
             },
             onEnd: function(e) {
-                console.log("onEnd")
+                // console.log("onEnd")
                 me.isMove = false
             },
             onMove: function(e) {
                 // console.log(me)
-                console.log(me.isMove)
+                // console.log(me.isMove)
                 if (!me.isMove) {
                     var pointNum = Math.round(e.offsetX / (me.options.barWidth + me.options.spaceWidth))
                     var point = me.filteredData[pointNum];
                     if (pointNum > me.filteredData.length - 1) {
                         return
                     }
-                    var text = "T" + formatDate(point[0]) + " 开盘" + point[1] + " 最高" + point[2] + " 最低" + point[3] + " 收盘" + point[4];
+                    var text = "T" + formatDate(point[0]) + " 开盘" + point[1] + " 最高" + point[2] + " 最低" + point[3] + " 收盘" + point[4]+ " 成交"+ point[5];
                     me.paint(me.data, me.dataRanges);
                     me.init.paintTips({ x: me.getX(pointNum) - 0.5, y: me.getY(point[4]) }, text)
                     return
@@ -172,8 +181,6 @@ initKlineCanvas.prototype = {
                     start = 0;
                     me.isMove = false
                     me.updateCounts += 1;
-                    console.log("更新了几次")
-                    console.log(me.isMove)
                     me.parentQuote.addOldData(me.data[0][0])
                     return
                 }
@@ -183,7 +190,6 @@ initKlineCanvas.prototype = {
                     return;
                 }
                 var changeToValue = { left: start, right: to };
-                // console.log(changeToValue)
                 this.startX = e.offsetX;
                 me.paint(me.data, { start: changeToValue.left, to: changeToValue.right });
             },
